@@ -21,17 +21,17 @@ app.get("/products", async (req, res) => {
 });
 
 app.get("/products/:pid", async (req, res) => {
-  const products = await manager.getProducts();
   const pid = req.params.pid;
-  const product = products.find((p) => p.id === pid);
 
-  if (!product) {
+  const prod = await manager.getProductById(pid);
+
+  if (!prod) {
     return res
       .status(404)
       .send("No se encontro un producto con la información provista");
   }
-  console.log(product);
-  return res.send(product);
+  console.log(prod);
+  return res.send(prod);
 });
 
 app.listen(port, () => {
