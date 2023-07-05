@@ -4,27 +4,24 @@ const app = express();
 const port = 8080;
 
 app.use(express.urlencoded({ extended: true }));
-const manager = new ProductManager("./product/products.json");
+const manager = new ProductManager("./src/product/products.json");
 
 app.get("/products", async (req, res) => {
   const products = await manager.getProducts();
   const limit = req.query.limit;
 
   if (!limit) {
-    console.log(products);
     return res.send(products);
   } else {
     const limitedProducts = products.slice(0, limit);
-    console.log(limitedProducts);
     return res.send(limitedProducts);
   }
 });
 
 app.get("/products/:pid", async (req, res) => {
-  const pid = req.params.pid;
-
+  const pid = parseInt(req.params.pid, 10);
   const prod = await manager.getProductById(pid);
-
+  console.log(prod);
   if (!prod) {
     return res
       .status(404)
