@@ -14,42 +14,46 @@ class ProductManager {
       !data.price ||
       !data.thumbnail ||
       !data.code ||
-      !data.stock
+      !data.stock ||
+      !(typeof data.status == "boolean")
     ) {
       return "Error: Todos los campos son obligatorios";
     }
 
-    const productExistence = this.products.findIndex(
+    const currentProducts = await this.getProducts(this.path);
+
+    const productExistence = currentProducts.findIndex(
       (product) => product.code === data.code
     );
 
     if (productExistence !== -1) {
       console.log("El código de producto ya fue utilizado.");
       return "El código de producto ya fue utilizado.";
+    } else {
+      const product = {
+        id: currentProducts.length + 1,
+        title: data.title,
+        description: data.description,
+        price: data.price,
+        thumbnail: data.thumbnail,
+        code: data.code,
+        stock: data.stock,
+        status: data.status,
+      };
+
+      currentProducts.push(product);
+
+      const productsString = JSON.stringify(currentProducts, null, 2);
+
+      fs.promises
+        .writeFile(this.path, productsString, "utf-8")
+        .then(() => {
+          console.log("Se almacena la información recibida");
+        })
+        .catch((err) => {
+          console.log({ err });
+        });
     }
-
-    const product = {
-      id: this.products.length + 1,
-      title: data.title,
-      description: data.description,
-      price: data.price,
-      thumbnail: data.thumbnail,
-      code: data.code,
-      stock: data.stock,
-    };
-
-    this.products.push(product);
-
-    const productsString = JSON.stringify(this.products, null, 2);
-
-    fs.promises
-      .writeFile(this.path, productsString, "utf-8")
-      .then(() => {
-        console.log("Se almacena la información recibida");
-      })
-      .catch((err) => {
-        console.log({ err });
-      });
   }
 
   async getProducts() {
@@ -58,8 +62,7 @@ class ProductManager {
       if (!data) {
         throw new Error("El archivo JSON está vacío");
       }
-      console.log(data);
-      const json = JSON.parse(data /* .replace(/\n/g, "") */);
+      const json = JSON.parse(data.replace(/\n/g, ""));
       return json;
     } catch (error) {
       console.error(error);

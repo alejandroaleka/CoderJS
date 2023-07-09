@@ -1,35 +1,31 @@
 const express = require("express");
-const ProductManager = require("./product/ProductManager");
+
+const productsRouter = require("./routers/productsRouter");
+const cartRouter = require("./routers/cartRouter");
+
 const app = express();
 const port = 8080;
 
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-const manager = new ProductManager("./src/product/products.json");
 
-app.get("/products", async (req, res) => {
-  const products = await manager.getProducts();
-  const limit = req.query.limit;
+/* app.use("/static", express.static("public"));
 
-  if (!limit) {
-    return res.send(products);
-  } else {
-    const limitedProducts = products.slice(0, limit);
-    return res.send(limitedProducts);
-  }
+app.use((req, res, next) => {
+  console.log("Middleware a nivel aplicación");
+
+  return next();
 });
 
-app.get("/products/:pid", async (req, res) => {
-  const pid = parseInt(req.params.pid, 10);
-  const prod = await manager.getProductById(pid);
-  console.log(prod);
-  if (!prod) {
-    return res
-      .status(404)
-      .send("No se encontro un producto con la información provista");
-  }
-  console.log(prod);
-  return res.send(prod);
-});
+app.use((err, req, res, next) => {
+  console.log("Middleware para manejo de errores");
+
+  return next();
+}); */
+
+app.use("/api/products", productsRouter);
+
+app.use("/api/carts", cartRouter);
 
 app.listen(port, () => {
   console.log(`Servidor escuchando en el puerto ${port}`);
