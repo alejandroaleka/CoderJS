@@ -6,7 +6,7 @@ const carts = [];
 
 cartRouter.post("/", async (req, res) => {
   const cart = {
-    id: cart.products.length,
+    id: cart.products.length + 1,
     products: [],
   };
 
@@ -21,8 +21,20 @@ cartRouter.post("/", async (req, res) => {
 cartRouter.get("/:cid", async (req, res) => {
   const cid = parseInt(req.params.cid, 10);
   const cart = carts.map(cid === carts.id);
+
+  if (!cid) {
+    res.status(404).send({ error: "Carrito no encontrado" });
+  }
+  res.status(200).json(cart);
 });
 
-cartRouter.post("/:cid/product/:pid", async (req, res) => {});
+cartRouter.post("/:cid/product/:pid", async (req, res) => {
+  const cid = parseInt(req.params.cid, 10);
+  const pid = parseInt(req.params.pid, 10);
+
+  if (!cid || !pid) {
+    res.status(404).send({ error: "Carrito no encontrado" });
+  }
+});
 
 module.exports = cartRouter;
